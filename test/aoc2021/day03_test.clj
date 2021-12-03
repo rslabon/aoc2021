@@ -27,21 +27,27 @@
         clen (count (first xs))]
     (mapv (fn [col] (mapv (fn [row] (get (get xs row) col)) (range 0 rlen))) (range 0 clen))))
 
+(defn most-common-bit [bit-freq]
+  (let [zero-freq (get bit-freq 0)
+        one-freq (get bit-freq 1)]
+    (if (>= one-freq zero-freq)
+      1
+      0
+      )))
+
+(defn least-common-bit [bit-freq]
+  (let [zero-freq (get bit-freq 0)
+        one-freq (get bit-freq 1)]
+    (if (< one-freq zero-freq)
+      1
+      0
+      )))
+
 (defn find-power [bin-numbers]
   (let [tbin-numbers (transpose-2d-array bin-numbers)
-        tbin-freqs (mapv frequencies tbin-numbers)
-        most-common (mapv #(let [zero-freq (get % 0)
-                                 one-freq (get % 1)]
-                             (if (> one-freq zero-freq)
-                               1
-                               0
-                               )) tbin-freqs)
-        least-common (mapv #(let [zero-freq (get % 0)
-                                  one-freq (get % 1)]
-                              (if (< one-freq zero-freq)
-                                1
-                                0
-                                )) tbin-freqs)
+        bit-freqs (mapv frequencies tbin-numbers)
+        most-common (mapv most-common-bit bit-freqs)
+        least-common (mapv least-common-bit bit-freqs)
         gamma (bin-array-to-dec most-common)
         epsilon (bin-array-to-dec least-common)]
     (* gamma epsilon)))
@@ -60,22 +66,6 @@
                                         bit-freq (frequencies (nth tbin-numbers idx))
                                         bit (choose-bit bit-freq)]
                                     (bit-criteria (filterv #(= (nth % idx) bit) bin-numbers) choose-bit (+ 1 idx))))))
-
-(defn most-common-bit [bit-freq]
-  (let [zero-freq (get bit-freq 0)
-        one-freq (get bit-freq 1)]
-    (if (>= one-freq zero-freq)
-      1
-      0
-      )))
-
-(defn least-common-bit [bit-freq]
-  (let [zero-freq (get bit-freq 0)
-        one-freq (get bit-freq 1)]
-    (if (< one-freq zero-freq)
-      1
-      0
-      )))
 
 (defn oxygen [bin-numbers]
   (bit-criteria bin-numbers most-common-bit))
