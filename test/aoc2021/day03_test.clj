@@ -52,40 +52,41 @@
     (is (= 775304 (find-power puzzle-bin-numbers)))
     ))
 
-(defn oxygen
-  ([bin-numbers] (oxygen bin-numbers 0))
-  ([bin-numbers idx] (if (= 1 (count bin-numbers))
-                       (bin-array-to-dec (first bin-numbers))
-                       (let [tbin-numbers (transpose-2d-array bin-numbers)
-                             tbin-freq (frequencies (nth tbin-numbers idx))
-                             most-common (let [zero-freq (get tbin-freq 0)
-                                               one-freq (get tbin-freq 1)]
-                                           (if (>= one-freq zero-freq)
-                                             1
-                                             0
-                                             ))
-                             ]
-                         (oxygen (filterv #(= (nth % idx) most-common) bin-numbers) (+ 1 idx))))))
+(defn bit-criteria
+  ([bin-numbers choose-bit] (bit-criteria bin-numbers choose-bit 0))
+  ([bin-numbers choose-bit idx] (if (= 1 (count bin-numbers))
+                                  (bin-array-to-dec (first bin-numbers))
+                                  (let [tbin-numbers (transpose-2d-array bin-numbers)
+                                        bit-freq (frequencies (nth tbin-numbers idx))
+                                        bit (choose-bit bit-freq)]
+                                    (bit-criteria (filterv #(= (nth % idx) bit) bin-numbers) choose-bit (+ 1 idx))))))
+
+(defn most-common-bit [bit-freq]
+  (let [zero-freq (get bit-freq 0)
+        one-freq (get bit-freq 1)]
+    (if (>= one-freq zero-freq)
+      1
+      0
+      )))
+
+(defn least-common-bit [bit-freq]
+  (let [zero-freq (get bit-freq 0)
+        one-freq (get bit-freq 1)]
+    (if (< one-freq zero-freq)
+      1
+      0
+      )))
+
+(defn oxygen [bin-numbers]
+  (bit-criteria bin-numbers most-common-bit))
 
 (deftest oxygen-test
   (testing "oxygen"
     (is (= 23 (oxygen example-bin-numbers)))
     ))
 
-(defn co2
-  ([bin-numbers] (co2 bin-numbers 0))
-  ([bin-numbers idx] (if (= 1 (count bin-numbers))
-                       (bin-array-to-dec (first bin-numbers))
-                       (let [tbin-numbers (transpose-2d-array bin-numbers)
-                             tbin-freq (frequencies (nth tbin-numbers idx))
-                             least-common (let [zero-freq (get tbin-freq 0)
-                                                one-freq (get tbin-freq 1)]
-                                            (if (< one-freq zero-freq)
-                                              1
-                                              0
-                                              ))
-                             ]
-                         (co2 (filterv #(= (nth % idx) least-common) bin-numbers) (+ 1 idx))))))
+(defn co2 [bin-numbers]
+  (bit-criteria bin-numbers least-common-bit))
 
 (deftest co2-test
   (testing "co2"
