@@ -138,7 +138,8 @@
         wins-boards-idx (filter #(not= nil %) wins)
         new-win-number? (not= last-win-boards-idx wins-boards-idx)
         last-win-number (if new-win-number? number last-win-number)
-        new-wins-boards (mapv #(nth new-boards %) (vec (set/difference (set wins-boards-idx) (set last-win-boards-idx))))
+        new-wins-board-idx (vec (set/difference (set wins-boards-idx) (set last-win-boards-idx)))
+        new-wins-boards (mapv #(nth new-boards %) new-wins-board-idx)
         last-win-sum (if new-win-number? (reduce + (mapv #(sum-of-unmarked %) new-wins-boards)) last-win-sum)]
     (if (empty? (rest numbers))
       (* last-win-sum last-win-number)
