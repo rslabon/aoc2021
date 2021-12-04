@@ -117,10 +117,8 @@
 (defn solve-1 [boards numbers]
   (let [number (first numbers)
         new-boards (mapv #(mark % number) boards)
-        wins (mapv #(wins? %) new-boards)
-        wins-boards-idx (filter #(not= nil %) (keep-indexed (fn [idx val] (if (true? val) idx nil)) wins))
-        wins-boards (mapv #(nth new-boards %) wins-boards-idx)
-        done? (true? (some true? wins))]
+        wins-boards (filter #(wins? %) new-boards)
+        done? (not-empty wins-boards)]
     (if done?
       (* number (reduce + (mapv #(sum-of-unmarked %) wins-boards)))
       (solve-1 new-boards (rest numbers))
