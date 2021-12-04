@@ -134,8 +134,8 @@
 (defn solve-2 [boards numbers last-win-sum last-win-number last-win-boards-idx]
   (let [number (first numbers)
         new-boards (mapv #(mark % number) boards)
-        wins (map-indexed #(if (wins? %2) %1 nil) new-boards)
-        wins-boards-idx (filter #(not= nil %) wins)
+        wins-boards-idx (map-indexed #(if (wins? %2) %1 nil) new-boards)
+        wins-boards-idx (filter some? wins-boards-idx)
         new-win-number? (not= last-win-boards-idx wins-boards-idx)
         last-win-number (if new-win-number? number last-win-number)
         new-wins-board-idx (vec (set/difference (set wins-boards-idx) (set last-win-boards-idx)))
