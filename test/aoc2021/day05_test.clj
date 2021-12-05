@@ -20,21 +20,21 @@
 
 (def example-lines (parse example-input))
 
-(defn cover-points [[x1 y1] [x2 y2]]
+(defn vh-cover-points [[x1 y1] [x2 y2]]
   (let [[x1 x2] (sort [x1 x2])
         [y1 y2] (sort [y1 y2])]
     (for [x (range x1 (inc x2)) y (range y1 (inc y2))] [x y])
     ))
 
-(deftest cover-points-test
-  (testing "cover points"
-    (is (= (cover-points [1 1] [1 3]) [[1 1] [1 2] [1 3]]))
-    (is (= (cover-points [9 7] [7 7]) [[7 7] [8 7] [9 7]]))
+(deftest vh-cover-points-test
+  (testing "vh cover points"
+    (is (= (vh-cover-points [1 1] [1 3]) [[1 1] [1 2] [1 3]]))
+    (is (= (vh-cover-points [9 7] [7 7]) [[7 7] [8 7] [9 7]]))
     ))
 
 (defn solve-1 [lines]
   (let [vh-lines (filter (fn [[[x1 y1] [x2 y2]]] (or (= x1 x2) (= y1 y2))) lines)
-        vh-points (map (fn [[[x1 y1] [x2 y2]]] (cover-points [x1 y1] [x2 y2])) vh-lines)
+        vh-points (map (fn [[[x1 y1] [x2 y2]]] (vh-cover-points [x1 y1] [x2 y2])) vh-lines)
         vh-points (reduce concat vh-points)
         overlap-count (count (filter #(<= 2 %) (vals (frequencies vh-points))))]
     overlap-count
@@ -73,12 +73,12 @@
     (is (= (diag-cover-points [9 7] [7 9]) [[9 7] [8 8] [7 9]]))
     (is (= (diag-cover-points [0 0] [9 9]) [[0 0] [1 1] [2 2] [3 3] [4 4] [5 5] [6 6] [7 7] [8 8] [9 9]]))
     ))
-;
+
 (defn solve-2 [lines]
   (let [diag-points (map (fn [[[x1 y1] [x2 y2]]] (diag-cover-points [x1 y1] [x2 y2])) lines)
         diag-points (reduce concat diag-points)
         vh-lines (filter (fn [[[x1 y1] [x2 y2]]] (or (= x1 x2) (= y1 y2))) lines)
-        vh-points (map (fn [[[x1 y1] [x2 y2]]] (cover-points [x1 y1] [x2 y2])) vh-lines)
+        vh-points (map (fn [[[x1 y1] [x2 y2]]] (vh-cover-points [x1 y1] [x2 y2])) vh-lines)
         vh-points (reduce concat vh-points)
         all-points (concat diag-points vh-points)
         overlap-count (count (filter #(<= 2 %) (vals (frequencies all-points))))]
