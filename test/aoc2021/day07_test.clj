@@ -7,18 +7,17 @@
 (def puzzle-input (slurp (io/resource "day07.txt")))
 (def puzzle-positions (map read-string (str/split puzzle-input #",")))
 
-(defn find-min [cost-fn positions all-possible-positions current-min]
-  (if (empty? all-possible-positions)
+(defn find-min [cost-fn positions current max current-min]
+  (if (= current max)
     current-min
-    (let [p (first all-possible-positions)
-          cost (reduce + (map #(cost-fn (Math/abs (- % p))) positions))]
+    (let [cost (reduce + (map #(cost-fn (Math/abs (- % current))) positions))]
       (if (< cost current-min)
-        (find-min cost-fn positions (rest all-possible-positions) cost)
+        (find-min cost-fn positions (inc current) max cost)
         current-min
         ))))
 
 (defn solve-1 [positions]
-  (find-min identity positions (range (apply min positions) (apply max positions)) Long/MAX_VALUE))
+  (find-min identity positions (apply min positions) (apply max positions) Long/MAX_VALUE))
 
 (deftest solve-1-test
   (testing "solve-1"
@@ -29,7 +28,7 @@
 (defn sum [n] (* (/ (+ 1 n) 2) n))
 
 (defn solve-2 [positions]
-  (find-min sum positions (range (apply min positions) (apply max positions)) Long/MAX_VALUE)
+  (find-min sum positions (apply min positions) (apply max positions) Long/MAX_VALUE)
   )
 
 (deftest solve-2-test
