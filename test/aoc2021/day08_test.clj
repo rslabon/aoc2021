@@ -64,25 +64,28 @@
 (defn contains-chars [s1 s2]
   (= (count s2) (intersection-count s1 s2)))
 
-(defn find-6 [pattern eight one]
-  (let [eight (str/split eight #"")
-        one (str/split one #"")
-        must-have-six-pattern (str/join "" (sort (vec (set/difference (set eight) (set one)))))
-        six (first (filter #(and (contains-chars % must-have-six-pattern) (= 1 (- (count %) (count must-have-six-pattern)))) pattern))]
-      six
+(defn minus-chars [s1 s2]
+  (str/join "" (sort (vec (set/difference (set s1) (set s2))))))
+
+(defn find-6 [pattern eight-segments one-segments]
+  (let [eight (str/split eight-segments #"")
+        one (str/split one-segments #"")
+        must-have-segments (minus-chars eight one)
+        six (first (filter #(and (contains-chars % must-have-segments) (= 1 (- (count %) (count must-have-segments)))) pattern))]
+    six
     ))
 
-(defn find-9 [pattern four]
-  (first (filter #(and (contains-chars % four)) pattern)))
+(defn find-9 [pattern four-segments]
+  (first (filter #(and (contains-chars % four-segments)) pattern)))
 
 (defn find-0 [pattern]
   (first (filter #(= 6 (count %)) pattern)))
 
-(defn find-3 [pattern one]
-  (first (filter #(and (contains-chars % one)) pattern)))
+(defn find-3 [pattern one-segments]
+  (first (filter #(and (contains-chars % one-segments)) pattern)))
 
-(defn find-5 [pattern six]
-  (first (filter #(= 5 (intersection-count % six)) pattern)))
+(defn find-5 [pattern six-segments]
+  (first (filter #(= 5 (intersection-count % six-segments)) pattern)))
 
 (defn remove [xs ys] (vec (set/difference (set xs) (set ys))))
 
@@ -91,25 +94,34 @@
         pattern (sort-strings pattern)
         output (sort-strings output)
 
-        one (first (filter #(= (count %) 2) pattern))
-        four (first (filter #(= (count %) 4) pattern))
-        seven (first (filter #(= (count %) 3) pattern))
-        eight (first (filter #(= (count %) 7) pattern))
+        one-segments (first (filter #(= (count %) 2) pattern))
+        four-segments (first (filter #(= (count %) 4) pattern))
+        seven-segments (first (filter #(= (count %) 3) pattern))
+        eight-segments (first (filter #(= (count %) 7) pattern))
 
-        pattern (remove pattern [one four seven eight])
-        six (find-6 pattern eight one)
-        pattern (remove pattern [six])
-        nine (find-9 pattern four)
-        pattern (remove pattern [nine])
-        zero (find-0 pattern)
-        pattern (remove pattern [zero])
-        three (find-3 pattern one)
-        pattern (remove pattern [three])
-        five (find-5 pattern six)
-        pattern (remove pattern [five])
-        two (first pattern)
+        pattern (remove pattern [one-segments four-segments seven-segments eight-segments])
+        six-segments (find-6 pattern eight-segments one-segments)
+        pattern (remove pattern [six-segments])
+        nine-segments (find-9 pattern four-segments)
+        pattern (remove pattern [nine-segments])
+        zero-segments (find-0 pattern)
+        pattern (remove pattern [zero-segments])
+        three-segments (find-3 pattern one-segments)
+        pattern (remove pattern [three-segments])
+        five-segments (find-5 pattern six-segments)
+        pattern (remove pattern [five-segments])
+        two-segments (first pattern)
 
-        numbers {zero 0 one 1 two 2 three 3 four 4 five 5 six 6 seven 7 eight 8 nine 9}
+        numbers {zero-segments  0
+                 one-segments   1
+                 two-segments   2
+                 three-segments 3
+                 four-segments  4
+                 five-segments  5
+                 six-segments   6
+                 seven-segments 7
+                 eight-segments 8
+                 nine-segments  9}
         decoded (map #(get numbers %) output)
         ]
     (Long/parseLong (str/join "" decoded) 10)
