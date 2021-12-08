@@ -55,14 +55,14 @@
     (is (= 521 (solve-1 puzzle-input)))
     ))
 
-(defn intersection-count [s1 s2]
+(defn count-intersection-chars [s1 s2]
   (let [s1 (str/split s1 #"")
         s2 (str/split s2 #"")]
     (count (set/intersection (set s1) (set s2)))
     ))
 
 (defn contains-chars [s1 s2]
-  (= (count s2) (intersection-count s1 s2)))
+  (= (count s2) (count-intersection-chars s1 s2)))
 
 (defn minus-chars [s1 s2]
   (str/join "" (sort (vec (set/difference (set s1) (set s2))))))
@@ -85,9 +85,9 @@
   (first (filter #(and (contains-chars % one-segments)) pattern)))
 
 (defn find-5 [pattern six-segments]
-  (first (filter #(= 5 (intersection-count % six-segments)) pattern)))
+  (first (filter #(= 5 (count-intersection-chars % six-segments)) pattern)))
 
-(defn remove [xs ys] (vec (set/difference (set xs) (set ys))))
+(defn subtract [xs ys] (vec (set/difference (set xs) (set ys))))
 
 (defn decode2 [line]
   (let [[pattern output] (parse line)
@@ -99,17 +99,17 @@
         seven-segments (first (filter #(= (count %) 3) pattern))
         eight-segments (first (filter #(= (count %) 7) pattern))
 
-        pattern (remove pattern [one-segments four-segments seven-segments eight-segments])
+        pattern (subtract pattern [one-segments four-segments seven-segments eight-segments])
         six-segments (find-6 pattern eight-segments one-segments)
-        pattern (remove pattern [six-segments])
+        pattern (subtract pattern [six-segments])
         nine-segments (find-9 pattern four-segments)
-        pattern (remove pattern [nine-segments])
+        pattern (subtract pattern [nine-segments])
         zero-segments (find-0 pattern)
-        pattern (remove pattern [zero-segments])
+        pattern (subtract pattern [zero-segments])
         three-segments (find-3 pattern one-segments)
-        pattern (remove pattern [three-segments])
+        pattern (subtract pattern [three-segments])
         five-segments (find-5 pattern six-segments)
-        pattern (remove pattern [five-segments])
+        pattern (subtract pattern [five-segments])
         two-segments (first pattern)
 
         numbers {zero-segments  0
