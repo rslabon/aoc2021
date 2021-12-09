@@ -30,6 +30,10 @@
 (defn height [matrix]
   (count matrix))
 
+(defn indices [matrix]
+  (for [x (range (height matrix))
+        y (range (width matrix))] [x y]))
+
 (defn adj [matrix x y]
   (let [corners [[(dec x) y] [(inc x) y] [x (dec y)] [x (inc y)]]
         height (height matrix)
@@ -65,10 +69,9 @@
     all-neighbours-are-greater))
 
 (defn find-low-points [matrix]
-  (let [indices (for [x (range (height matrix))
-                      y (range (width matrix))] [x y])
-        low-points (filter (fn [[x y]] (low-point? matrix x y)) indices)
-        low-points (map (fn [[x y]] [(get-value matrix x y) x y]) low-points)]
+  (let [indices (indices matrix)
+        low-points-indices (filter (fn [[x y]] (low-point? matrix x y)) indices)
+        low-points (map (fn [[x y]] [(get-value matrix x y) x y]) low-points-indices)]
     low-points))
 
 (defn solve-1 [matrix]
