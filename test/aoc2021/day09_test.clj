@@ -24,10 +24,16 @@
 (defn get-value [matrix x y]
   (nth (nth (vec matrix) x) y))
 
+(defn width [matrix]
+  (count (nth matrix 0)))
+
+(defn height [matrix]
+  (count matrix))
+
 (defn adj [matrix x y]
   (let [corners [[(dec x) y] [(inc x) y] [x (dec y)] [x (inc y)]]
-        height (count matrix)
-        width (count (nth matrix 0))
+        height (height matrix)
+        width (width matrix)
         corners (filter (fn [[x y]] (and (>= x 0) (>= y 0) (< x height) (< y width))) corners)]
     (map (fn [[x y]] [(get-value matrix x y) x y]) corners)
     ))
@@ -52,17 +58,17 @@
                    [8 2 1]]) (set (adj matrix 2 0))))
       )))
 
+(defn low-point? [matrix x y]
+  (let [current (get-value matrix x y)
+        neighbours (adj matrix x y)
+        all-neighbours-are-greater (every? (fn [[val]] (< current val)) neighbours)]
+    all-neighbours-are-greater))
+
 (defn find-low-points [matrix]
-  (let [low-points (for [x (range (count matrix))
-                         y (range (count (nth matrix 0)))]
-                     (let [current (get-value matrix x y)
-                           neighbours (adj matrix x y)
-                           all-neighbours-are-greater (every? (fn [[val]] (< current val)) neighbours)]
-                       (if (true? all-neighbours-are-greater)
-                         [current x y]
-                         nil
-                         )))
-        low-points (filter not-empty low-points)]
+  (let [indices (for [x (range (height matrix))
+                      y (range (width matrix))] [x y])
+        low-points (filter (fn [[x y]] (low-point? matrix x y)) indices)
+        low-points (map (fn [[x y]] [(get-value matrix x y) x y]) low-points)]
     low-points))
 
 (defn solve-1 [matrix]
