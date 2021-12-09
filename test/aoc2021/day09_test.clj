@@ -24,12 +24,6 @@
 (defn get-value [matrix x y]
   (nth (nth (vec matrix) x) y))
 
-(defn set-value [matrix x y val]
-  (map-indexed (fn [row-idx row-val] (if (= row-idx x)
-                                       (map-indexed (fn [col-idx col-val] (if (= col-idx y) val col-val)) row-val)
-                                       row-val
-                                       ))) matrix)
-
 (defn adj [matrix x y]
   (let [corners [[(dec x) y] [(inc x) y] [x (dec y)] [x (inc y)]]
         height (count matrix)
