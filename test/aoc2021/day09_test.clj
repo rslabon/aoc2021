@@ -84,11 +84,12 @@
     ))
 
 (defn walk-up [matrix point]
-  (let [[val x y] point
-        neighbours (filter (fn [[i]] (and (> i val) (not= i 9))) (adj matrix x y))]
-    (if (empty? neighbours)
+  (let [[current x y] point
+        neighbours (adj matrix x y)
+        greater-neighbours (filter (fn [[neighbour-value]] (and (> neighbour-value current) (not= neighbour-value 9))) neighbours)]
+    (if (empty? greater-neighbours)
       [point]
-      (concat [point] (mapcat #(walk-up matrix %) neighbours))
+      (concat [point] (mapcat #(walk-up matrix %) greater-neighbours))
       )))
 
 (defn find-basin [matrix point]
@@ -107,7 +108,7 @@
         basins (map #(find-basin matrix %) low-points)
         basins (sort-by - basins)
         basins (take 3 basins)]
-    (reduce * 1 basins)
+    (reduce * basins)
     ))
 
 (deftest solve-2-test
