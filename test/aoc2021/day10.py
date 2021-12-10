@@ -20,17 +20,13 @@ def find_illegal2(chars):
     stack = []
     score = {")": 1, "]": 2, "}": 3, ">": 4}
     open_close = {"(": ")", "{": "}", "<": ">", "[": "]"}
-    illegal = []
     for c in chars:
         if c in "([{<":
             stack.append(c)
         else:
             o = stack.pop()
             if open_close.get(o) != c:
-                illegal.append(c)
-
-    if illegal:
-        return 0
+                return 0
 
     result = 0
     for c in reversed(stack):
