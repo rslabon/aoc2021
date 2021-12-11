@@ -21,10 +21,10 @@ def flash(grid, i, j, flashed):
 
 def step(grid):
     num_of_flashes = 0
-    visited = []
+    flashed = []
     for i in range(len(grid)):
         for j in range(len(grid[0])):
-            num_of_flashes += flash(grid, i, j, visited)
+            num_of_flashes += flash(grid, i, j, flashed)
     return num_of_flashes
 
 
