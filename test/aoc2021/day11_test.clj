@@ -9,35 +9,55 @@
 (defn parse [input]
   (mapv #(mapv read-string (str/split % #"")) (str/split-lines input)))
 
+(defn indices [grid]
+  (for [i (range (count grid)) j (range (count (first grid)))] [i j]))
+
 (defn get-value [grid x y]
   (nth (nth grid x) y))
 
 (defn set-value [grid x y val]
-  (vec (map-indexed (fn [i row] (vec (map-indexed (fn [j cell] (if (and (= x i) (= y j)) val cell)) row))) grid)))
+  (vec (map-indexed
+         (fn [i row] (vec
+                       (map-indexed
+                         (fn [j cell]
+                           (if (and (= x i) (= y j))
+                             (if (function? val) (val cell) val)
+                             cell))
+                         row)))
+         grid)))
 
 (defn in-range? [grid x y]
   (let [height (count grid)
-        width (count (nth grid 0))]
-    (and (>= x 0) (>= y 0) (< x height) (< y width))
+        width (count (first grid))]
+    (and (>= x 0)
+         (>= y 0)
+         (< x height)
+         (< y width))
     ))
 
 (defn flash [{flashed :flashed grid :grid number-of-flushes :number-of-flashes :as state} x y]
-  (let [already-flashed? (true? (some #(= % [x y]) flashed))]
+  (let [already-flashed? (true? (some #(= % [x y]) flashed))
+        set-grid (partial set-value grid)
+        get-grid (partial get-value grid)]
     (cond
       (or already-flashed? (not (in-range? grid x y))) state
-      (= 9 (get-value grid x y)) (let [state (assoc state :grid (set-value grid x y 0))
-                                       state (assoc state :flashed (conj flashed [x y]))
-                                       state (assoc state :number-of-flashes (inc number-of-flushes))
-                                       coords [[1 0] [-1 0] [0 -1] [0 1] [-1 -1] [1 -1] [-1 1] [1 1]]
-                                       state (reduce (fn [state, [i j]] (flash state (+ x i) (+ y j))) state coords)]
-                                   state)
-      :else (assoc state :grid (set-value grid x y (+ 1 (get-value grid x y))))
+      (= 9 (get-grid x y)) (-> state
+                               (assoc :grid (set-grid x y 0))
+                               (assoc :flashed (conj flashed [x y]))
+                               (assoc :number-of-flashes (inc number-of-flushes))
+                               (flash (+ x 1) y)
+                               (flash (- x 1) y)
+                               (flash x (- y 1))
+                               (flash x (+ y 1))
+                               (flash (- x 1) (- y 1))
+                               (flash (+ x 1) (- y 1))
+                               (flash (- x 1) (+ y 1))
+                               (flash (+ x 1) (+ y 1)))
+      :else (assoc state :grid (set-grid x y inc))
       )))
 
 (defn step [grid]
-  (let [height (count grid)
-        width (count (nth grid 0))
-        indices (for [i (range height) j (range width)] [i j])
+  (let [indices (indices grid)
         state {:grid grid :number-of-flashes 0 :flashed []}
         state (reduce (fn [next-state [x y]] (flash next-state x y)) state indices)
         state (dissoc state :flashed)]
@@ -57,18 +77,18 @@
 
 
 (deftest step-test
-  (testing "step"
-    (is (= {:grid              [[3 4 5 4 3]
-                                [4 0 0 0 4]
-                                [5 0 0 0 5]
-                                [4 0 0 0 4]
-                                [3 4 5 4 3]]
-            :number-of-flashes 9}
-           (step [[1 1 1 1 1]
-                  [1 9 9 9 1]
-                  [1 9 1 9 1]
-                  [1 9 9 9 1]
-                  [1 1 1 1 1]])))))
+  (let [input [[1 1 1 1 1]
+               [1 9 9 9 1]
+               [1 9 1 9 1]
+               [1 9 9 9 1]
+               [1 1 1 1 1]]
+        expected [[3 4 5 4 3]
+                  [4 0 0 0 4]
+                  [5 0 0 0 5]
+                  [4 0 0 0 4]
+                  [3 4 5 4 3]]]
+    (testing "step"
+      (is (= {:grid expected :number-of-flashes 9} (step input))))))
 
 (deftest solve1-test
   (testing "solve1"

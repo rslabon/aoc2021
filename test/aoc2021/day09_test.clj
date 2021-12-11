@@ -38,7 +38,10 @@
   (let [corners [[(dec x) y] [(inc x) y] [x (dec y)] [x (inc y)]]
         height (height matrix)
         width (width matrix)
-        corners (filter (fn [[x y]] (and (>= x 0) (>= y 0) (< x height) (< y width))) corners)]
+        corners (filter (fn [[x y]] (and (>= x 0)
+                                         (>= y 0)
+                                         (< x height)
+                                         (< y width))) corners)]
     (map (fn [[x y]] [(get-value matrix x y) x y]) corners)
     ))
 
@@ -89,7 +92,9 @@
 (defn walk-up [matrix point]
   (let [[current x y] point
         neighbours (adj matrix x y)
-        greater-neighbours (filter (fn [[neighbour-value]] (and (> neighbour-value current) (not= neighbour-value 9))) neighbours)]
+        greater-neighbours (filter (fn [[neighbour-value]]
+                                     (and (> neighbour-value current)
+                                          (not= neighbour-value 9))) neighbours)]
     (if (empty? greater-neighbours)
       [point]
       (concat [point] (mapcat #(walk-up matrix %) greater-neighbours))
