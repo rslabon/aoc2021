@@ -31,33 +31,11 @@ class Graph:
         n1.adj.append(n2)
         n2.adj.append(n1)
 
-    @staticmethod
-    def visit_small_only_once(node, path):
-        return not node.value.isupper() and node in path
-
-    @staticmethod
-    def visit_small_only_once(node, path):
-        return not node.value.isupper() and node in path
-
-    @staticmethod
-    def visit_single_small_twice(node, path):
-        if node.value == "start" and node in path:
-            return True
-
-        visited_small_caves = list(filter(lambda n: n.value.islower() and n.value not in ["start", "end"], path))
-        if len(visited_small_caves) > 0:
-            counter = Counter(visited_small_caves)
-            allowed_max = 0
-            if max(counter.values()) < 2:
-                allowed_max += 1
-            if counter[node] > allowed_max:
-                return True
-
-        return False
-
-    def paths(self, visited_fn, node, path, all_paths):
-        if visited_fn(node, path):
-            return
+    def paths(self, max_small, node, path, all_paths):
+        if not node.value.isupper() and node in path:
+            max_small -= 1
+            if max_small == 0 or node.value == "start":
+                return
 
         path.append(node)
         if node.value == "end":
@@ -65,7 +43,7 @@ class Graph:
             return
         else:
             for n in node.adj:
-                self.paths(visited_fn, n, path.copy(), all_paths)
+                self.paths(max_small, n, path.copy(), all_paths)
 
 
 def parse(text):
@@ -80,14 +58,14 @@ def parse(text):
 def solve1(text):
     g = parse(text)
     paths = []
-    g.paths(Graph.visit_small_only_once, g.get_node("start"), [], paths)
+    g.paths(1, g.get_node("start"), [], paths)
     return len(paths)
 
 
 def solve2(text):
     g = parse(text)
     paths = []
-    g.paths(Graph.visit_single_small_twice, g.get_node("start"), [], paths)
+    g.paths(2, g.get_node("start"), [], paths)
     return len(paths)
 
 
