@@ -28,13 +28,13 @@
         visited? (some #(= % value) path)
         max (if (and small? visited?) (dec max) max)]
     (if (and small? visited? (or (= max 0) (= value "start")))
-      0
+      []
       (let [path (conj path value)
             node (get-node graph value)
             adj (:adj node)]
         (if (= value "end")
-          1
-          (reduce + (map #(paths graph max % path) adj))
+          [path]
+          (mapcat #(paths graph max % path) adj)
           ))
       )))
 
@@ -45,7 +45,7 @@
   )
 
 (defn solve1 [input]
-  (paths (parse input) 1 "start" []))
+  (count (paths (parse input) 1 "start" [])))
 
 (deftest solve1-test
   (testing "solve1"
@@ -54,7 +54,7 @@
     ))
 
 (defn solve2 [input]
-  (paths (parse input) 2 "start" []))
+  (count (paths (parse input) 2 "start" [])))
 
 (deftest solve2-test
   (testing "solve2"
