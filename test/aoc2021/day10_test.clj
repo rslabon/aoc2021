@@ -9,8 +9,11 @@
 (defn open? [char]
   (str/includes? "([{<" char))
 
-(defn close [char]
-  (let [open-close {"(" ")" "{" "}" "[" "]" "<" ">"}] (get open-close char)))
+(defn close-for [open-char]
+  (let [open-close {"(" ")" "{" "}" "[" "]" "<" ">"}] (get open-close open-char)))
+
+(defn illegal-close? [open-char close-char]
+  (not= (close-for open-char) close-char))
 
 (defn find-first-illegal
   ([chunk] (let [chars (str/split chunk #"")]
@@ -19,18 +22,18 @@
                (cond
                  (empty? chars) nil
                  (open? (first chars)) (recur (rest chars) (conj stack (first chars)))
-                 (not= (close (first stack)) (first chars)) (first chars)
+                 (illegal-close? (first stack) (first chars)) (first chars)
                  :else (recur (rest chars) (rest stack))
                  )))))
 
-(defn find-first-illegal2
+(defn find-all-missing
   ([chunk] (let [chars (str/split chunk #"")]
              (loop [chars chars
                     stack '()]
                (cond
-                 (empty? chars) (map close stack)
+                 (empty? chars) (map close-for stack)
                  (open? (first chars)) (recur (rest chars) (conj stack (first chars)))
-                 (not= (close (first stack)) (first chars)) '()
+                 (illegal-close? (first stack) (first chars)) '()
                  :else (recur (rest chars) (rest stack))
                  )))))
 
@@ -48,7 +51,7 @@
 
 (defn solve2 [input]
   (let [lines (str/split-lines input)
-        missing (filter not-empty (map find-first-illegal2 lines))
+        missing (filter not-empty (map find-all-missing lines))
         points (map points missing)
         points (sort points)
         middle (nth points (Math/floor (/ (count points) 2)))]
