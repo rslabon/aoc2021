@@ -74,6 +74,13 @@ def solve1(text):
     return len(coords)
 
 
+def show(coords):
+    width = max(map(lambda i: i[0], coords)) + 1
+    height = max(map(lambda i: i[1], coords)) + 1
+    m = "\n".join(["".join(["#" if (j, i) in coords else " " for j in range(width)]) for i in range(height)])
+    print(m)
+
+
 def solve2(text):
     coords, folds = parse(text)
     for fold in folds:
@@ -82,10 +89,7 @@ def solve2(text):
         else:
             coords = fold_by_y(coords, fold[1])
 
-    width = max(map(lambda i: i[0], coords)) + 1
-    height = max(map(lambda i: i[1], coords)) + 1
-    m = "\n".join(["".join(["#" if (j, i) in coords else " " for j in range(width)]) for i in range(height)])
-    print(m)
+    show(coords)
 
 
 print(solve1(example))
