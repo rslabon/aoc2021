@@ -29,30 +29,6 @@ def parse(text):
     return template, insertions
 
 
-def step(template, dic):
-    result = template[0:1]
-    while template:
-        a = template[0:2]
-        if len(a) == 2:
-            result += dic[a] + a[1]
-        template = template[1::]
-    return result
-
-
-def solve1(text):
-    template, insertions = parse(text)
-    dic = {}
-    for a, b in insertions:
-        dic[a] = b
-
-    for _ in range(10):
-        template = step(template, dic)
-
-    counter = Counter([c for c in template])
-    result = max(counter.values()) - min(counter.values())
-    return result
-
-
 def freq(template):
     result = {}
     while template:
@@ -63,7 +39,7 @@ def freq(template):
     return result
 
 
-def solve2(text):
+def solve(steps, text):
     template, insertions = parse(text)
     rules = {}
     transition = {}
@@ -71,21 +47,28 @@ def solve2(text):
         rules[a] = (a[0] + b, b + a[1])
         transition[a] = b
 
-    f = freq(template)
-    c = Counter([c for c in template])
+    step_freq = freq(template)
+    count_letters = Counter([c for c in template])
 
-    for o in range(40):
-        ftmp = {}
-        for k in f.keys():
-            x = f[k]
-            r1, r2 = rules[k]
-            c[transition[k]] = x + c.get(transition[k], 0)
-            ftmp[r1] = x + ftmp.get(r1, 0)
-            ftmp[r2] = x + ftmp.get(r2, 0)
-        f = ftmp
+    for _ in range(steps):
+        next_step_freq = {}
+        for step_rule in step_freq.keys():
+            occurrences = step_freq[step_rule]
+            r1, r2 = rules[step_rule]
+            count_letters[transition[step_rule]] = occurrences + count_letters.get(transition[step_rule], 0)
+            next_step_freq[r1] = occurrences + next_step_freq.get(r1, 0)
+            next_step_freq[r2] = occurrences + next_step_freq.get(r2, 0)
+        step_freq = next_step_freq
 
-    result = max(c.values()) - min(c.values())
-    return result
+    return max(count_letters.values()) - min(count_letters.values())
+
+
+def solve1(text):
+    return solve(10, text)
+
+
+def solve2(text):
+    return solve(40, text)
 
 
 print(solve1(example))
