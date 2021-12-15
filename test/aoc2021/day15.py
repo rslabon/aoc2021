@@ -86,23 +86,6 @@ class Graph:
             self.relax(node, pq)
 
 
-def parse(text):
-    graph = Graph()
-    grid = [[int(v) for v in line] for line in text.splitlines()]
-    height = len(grid)
-    width = len(grid[0])
-    indices = [(i, j) for i in range(len(grid)) for j in range(width)]
-
-    for i, j in indices:
-        v = grid[i][j]
-        adj = [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)]
-        for ni, nj in adj:
-            if 0 <= ni < height and 0 <= nj < width:
-                graph.add_edge((i, j, v), (ni, nj, grid[ni][nj]))
-
-    return graph, grid
-
-
 def increase_grid(n, original_grid):
     height = len(original_grid)
     width = len(original_grid[0])
