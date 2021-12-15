@@ -82,7 +82,6 @@ class Graph:
         heapq.heapify(pq)
 
         while len(pq) > 0:
-            print(len(pq))
             _, node = heapq.heappop(pq)
             self.relax(node, pq)
 
@@ -104,10 +103,42 @@ def parse(text):
     return graph, grid
 
 
-def solve1(text):
-    graph, grid = parse(text)
+def increase_grid(n, original_grid):
+    height = len(original_grid)
+    width = len(original_grid[0])
+    indices = [(i, j) for i in range(height * n) for j in range(width * n)]
+
+    grid = [[-1 for _ in range(width * n)] for _ in range(height * n)]
+    for i, j in indices:
+        l = i // height + j // width
+        v = original_grid[i % height][j % width] + l
+        if v > 9:
+            v = (v % 10) + 1
+        grid[i][j] = v
+    return grid
+
+
+def make_graph(grid):
+    graph = Graph()
     height = len(grid)
     width = len(grid[0])
+    indices = [(i, j) for i in range(height) for j in range(width)]
+
+    for i, j in indices:
+        adj = [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)]
+        v = grid[i][j]
+        for ni, nj in adj:
+            if 0 <= ni < height and 0 <= nj < width:
+                nv = grid[ni][nj]
+                graph.add_edge((i, j, v), (ni, nj, nv))
+
+    return graph
+
+
+def solve(graph, grid):
+    height = len(grid)
+    width = len(grid[0])
+
     entry_value = grid[0][0]
     top_left_node = graph.get_node((0, 0, entry_value))
     bottom_right_node = graph.get_node((height - 1, width - 1, grid[height - 1][width - 1]))
@@ -119,10 +150,27 @@ def solve1(text):
     for node in path:
         s += node.value[2]
     s -= entry_value
-    
+
     return s
+
+
+def solve1(text):
+    grid = [[int(v) for v in line] for line in text.splitlines()]
+    graph = make_graph(grid)
+    return solve(graph, grid)
+
+
+def solve2(text):
+    original_grid = [[int(v) for v in line] for line in text.splitlines()]
+    grid = increase_grid(5, original_grid)
+    graph = make_graph(grid)
+    return solve(graph, grid)
 
 
 print(solve1(example))
 f = open("../../resources/day15.txt")
 print(solve1(f.read()))
+
+print(solve2(example))
+f = open("../../resources/day15.txt")
+print(solve2(f.read()))
