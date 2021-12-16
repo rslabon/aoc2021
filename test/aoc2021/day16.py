@@ -30,7 +30,7 @@ def count_version(command):
     if command_type == "literal":
         return command_version
     else:
-        return command_version + reduce(operator.add, map(lambda i: count_version(i), command["args"]))
+        return command_version + reduce(operator.add, map(count_version, command["args"]))
 
 
 def compute(command):
@@ -43,8 +43,6 @@ def compute(command):
         return sum(map(lambda i: compute(i), command_args))
 
     if command_type == "product":
-        if len(command_args) == 1:
-            return compute(command_args[0])
         p = 1
         for c in command_args:
             p *= compute(c)
