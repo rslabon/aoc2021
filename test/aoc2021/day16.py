@@ -40,7 +40,7 @@ def compute(command):
 
     command_args = command["args"]
     if command_type == "sum":
-        return sum(map(lambda i: compute(i), command_args))
+        return sum(map(compute, command_args))
 
     if command_type == "product":
         p = 1
@@ -50,10 +50,10 @@ def compute(command):
         return p
 
     if command_type == "min":
-        return min(map(lambda i: compute(i), command_args))
+        return min(map(compute, command_args))
 
     if command_type == "max":
-        return max(map(lambda i: compute(i), command_args))
+        return max(map(compute, command_args))
 
     if command_type == "lt":
         if compute(command_args[0]) < compute(command_args[1]):
