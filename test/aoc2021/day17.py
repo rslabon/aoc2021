@@ -11,7 +11,7 @@ def initial_velocities(text):
     xrange = target_area["xrange"]
     yrange = target_area["yrange"]
     velocities = []
-    for i in range(xrange[1] + 1 + (xrange[1] - xrange[0])):
+    for i in range(xrange[1] + 1):
         for j in range(yrange[0] - 1, abs(yrange[0]) + 1):
             position = {"x": 0, "y": 0}
             velocity = {"x": i, "y": j}
