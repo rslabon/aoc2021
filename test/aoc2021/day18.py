@@ -82,11 +82,8 @@ class Node:
         return False
 
     def reduce(self):
-        while True:
-            if self.explode():
-                continue
-            if not self.split():
-                break
+        while self.explode() or self.split():
+            pass
 
     def add_right(self):
         current = self
