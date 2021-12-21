@@ -25,7 +25,7 @@ def roll(p1, p2):
     p2_score = 0
 
     throws = 0
-    while p1_score < 1000 and p2_score < 1000:
+    while True:
         p1 = next_position(p1 + next_dice(dice))
         p1_score += p1
         dice = cyclic(dice + 3, 100)
@@ -37,6 +37,8 @@ def roll(p1, p2):
         p2_score += p2
         dice = cyclic(dice + 3, 100)
         throws += 3
+        if p2_score >= 1000:
+            break
 
     return throws * min(p1_score, p2_score)
 
